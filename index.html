@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Reads - 精选阅读</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-color: #333;
+            --bg-color: #fff;
+            --highlight-color: #d23669;
+            --secondary-color: #6c757d;
+            --border-color: #eee;
+            --link-color: #0366d6;
+            --card-bg: #f8f9fa;
+            --header-bg: #f8f9fa;
+        }
+
+        [data-theme="dark"] {
+            --text-color: #eee;
+            --bg-color: #121212;
+            --highlight-color: #ff7597;
+            --secondary-color: #adb5bd;
+            --border-color: #2d2d2d;
+            --link-color: #58a6ff;
+            --card-bg: #1e1e1e;
+            --header-bg: #1e1e1e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background-color: var(--header-bg);
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .title-small {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 5px;
+        }
+
+        h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 2rem;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .article-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .card-description {
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .read-button {
+            display: inline-block;
+            background-color: var(--highlight-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .read-button:hover {
+            background-color: #b02c57;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h3 class="title-small">Web Reads</h3>
+            <button class="theme-toggle" id="theme-toggle">🌙</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Web Reads - 精选阅读</h1>
+        <p class="subtitle">移动友好的阅读体验，精选内容随时随地享受</p>
+
+        <div class="articles-grid">
+            <div class="article-card">
+                <div class="card-content">
+                    <h3 class="card-title">堡垒之夜之战：Epic Games 与苹果 App Store 垄断诉讼全纪实</h3>
+                    <p class="card-description">详细记录了从2020年开始的Epic Games与苹果公司之间关于App Store政策的法律纠纷，以及这场官司对整个科技行业的深远影响。</p>
+                    <a href="Epic 大战 Apple/index.html" class="read-button">阅读文章</a>
+                </div>
+            </div>
+
+            <!-- 这里可以添加更多文章卡片 -->
+            <div class="article-card">
+                <div class="card-content">
+                    <h3 class="card-title">即将添加的文章</h3>
+                    <p class="card-description">更多精彩内容即将上线，敬请期待...</p>
+                    <a href="#" class="read-button" style="background-color: var(--secondary-color);">敬请期待</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Web Reads. 移动友好的阅读体验。</p>
+    </footer>
+
+    <script>
+        // 暗黑模式切换功能
+        const themeToggle = document.getElementById('theme-toggle');
+
+        // 检查本地存储中的主题设置
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        }
+
+        // 切换主题
+        themeToggle.addEventListener('click', () => {
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeToggle.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggle.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>
