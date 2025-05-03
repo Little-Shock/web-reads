@@ -1,0 +1,14 @@
+{
+  "name": "web-reads",
+  "version": "1.0.0",
+  "description": "将Markdown文章转换为移动友好的HTML页面",
+  "main": "md2html.js",
+  "scripts": {
+    "convert": "node md2html.js"
+  },
+  "dependencies": {
+    "marked": "^4.3.0"
+  },
+  "author": "",
+  "license": "MIT"
+}

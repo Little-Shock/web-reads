@@ -120,6 +120,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .article-card:hover {
@@ -162,7 +163,16 @@
         }
 
         .read-button:hover {
-            background-color: #b02c57;
+            background-color: var(--highlight-color);
+            opacity: 0.9;
+        }
+
+        .card-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
         }
 
         footer {
@@ -172,6 +182,13 @@
             color: var(--secondary-color);
             font-size: 0.9rem;
             border-top: 1px solid var(--border-color);
+        }
+
+        .last-updated {
+            text-align: center;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-top: 30px;
         }
 
         @media (max-width: 768px) {
@@ -194,27 +211,59 @@
     </header>
 
     <div class="container">
-        <h1>Web Reads </h1>
-        <p class="subtitle">移动友好的阅读体验 </p>
+        <h1>Web Reads</h1>
+        <p class="subtitle">移动友好的阅读体验</p>
 
         <div class="articles-grid">
+            
             <div class="article-card">
+                <div class="card-accent" style="background-color: #6ab04c;"></div>
                 <div class="card-content">
-                    <h3 class="card-title">堡垒之夜之战：Epic Games 与苹果 App Store 垄断诉讼全纪实</h3>
-                    <p class="card-description">详细记录了从2020年开始的Epic Games与苹果公司之间关于App Store政策的法律纠纷，以及这场官司对整个科技行业的深远影响。</p>
-                    <a href="Epic 大战 Apple/index.html" class="read-button">阅读文章</a>
+                    <h3 class="card-title">咖啡与茶</h3>
+                    <p class="card-description"></p>
+                    <a href="咖啡与茶/index.html" class="read-button" style="background-color: #6ab04c;">阅读文章</a>
                 </div>
             </div>
-
-            <!-- 第二篇文章 -->
+        
             <div class="article-card">
+                <div class="card-accent" style="background-color: #eb4d4b;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">赛博谷子</h3>
+                    <p class="card-description">赛博风格二次元“谷子”生态研究</p>
+                    <a href="赛博谷子站/index.html" class="read-button" style="background-color: #eb4d4b;">阅读文章</a>
+                </div>
+            </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #22a6b3;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">1950–2024年非虚构图书副标题长度趋势分析</h3>
+                    <p class="card-description">好的，我将提取 1950–2024 年间 Open Library 中的非虚构图书数据，分析副标题长度随时间的演变趋势，并标注诺贝尔奖作者的作品以比较学术出版与大众市场的差异。我会使用 OLS 回归建模年份对副标题长度的影响，并输出副标题长度的散点图及一篇约 900 字的趋势评论。完成后将以中...</p>
+                    <a href="非虚构书籍标题长度/index.html" class="read-button" style="background-color: #22a6b3;">阅读文章</a>
+                </div>
+            </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #d23669;"></div>
                 <div class="card-content">
                     <h3 class="card-title">从《堡垒之夜》下架到最高院胜利：Epic Games 对抗苹果的五年之战</h3>
-                    <p class="card-description">记录了Epic Games与苹果公司长达五年的法律斗争，以及最终在美国最高法院的胜利如何改变了移动应用生态。</p>
-                    <a href="Epic 大战 Apple-new/index.html" class="read-button">阅读文章</a>
+                    <p class="card-description">（本文作者根据公开资料整理，参考了 Reuters、CBS News、The Guardian 等媒体的报道和判决文件内容，特此致谢。）</p>
+                    <a href="Epic 大战 Apple-new/index.html" class="read-button" style="background-color: #d23669;">阅读文章</a>
                 </div>
             </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #8854d0;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">堡垒之夜之战：Epic Games 与苹果 App Store 垄断诉讼全纪实</h3>
+                    <p class="card-description">2020年8月的某一天，游戏界突然爆发了一场"叛乱"。热门游戏《堡垒之夜 (Fortnite)》的开发商 Epic Games 悄悄在 iOS 版游戏中加入了一项新功能：玩家可以直接向 Epic 支付游戏币，不再通过苹果的 App Store 付款渠道。不仅如此，Epic 还大方宣布玩家直接付...</p>
+                    <a href="Epic 大战 Apple/index.html" class="read-button" style="background-color: #8854d0;">阅读文章</a>
+                </div>
+            </div>
+        
         </div>
+
+        <p class="last-updated">最后更新: 2025年05月03日 10:19</p>
     </div>
 
     <footer>
