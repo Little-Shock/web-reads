@@ -304,6 +304,25 @@ def generate_index_html(articles):
             margin-bottom: 2rem;
         }}
 
+        .little-shock-link {{
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }}
+
+        .little-shock-link a {{
+            color: var(--link-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--secondary-color);
+            padding-bottom: 2px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }}
+
+        .little-shock-link a:hover {{
+            color: var(--highlight-color);
+            border-color: var(--highlight-color);
+        }}
+
         .articles-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -413,6 +432,10 @@ def generate_index_html(articles):
     <div class="container">
         <h1>Web Reads</h1>
         <p class="subtitle">移动友好的阅读体验</p>
+
+        <div class="little-shock-link">
+            <a href="https://waytoagi.feishu.cn/wiki/UaxewECiHiVBmykypR0c48FhnFd" target="_blank">Little Shock 专区 @ WaytoAGI</a>
+        </div>
 
         <div class="articles-grid">
             {article_cards}

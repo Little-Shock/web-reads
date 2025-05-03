@@ -104,6 +104,25 @@
             margin-bottom: 2rem;
         }
 
+        .little-shock-link {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .little-shock-link a {
+            color: var(--link-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--secondary-color);
+            padding-bottom: 2px;
+            transition: color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .little-shock-link a:hover {
+            color: var(--highlight-color);
+            border-color: var(--highlight-color);
+        }
+
         .articles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -214,17 +233,12 @@
         <h1>Web Reads</h1>
         <p class="subtitle">移动友好的阅读体验</p>
 
+        <div class="little-shock-link">
+            <a href="https://waytoagi.feishu.cn/wiki/UaxewECiHiVBmykypR0c48FhnFd" target="_blank">Little Shock 专区 @ WaytoAGI</a>
+        </div>
+
         <div class="articles-grid">
             
-            <div class="article-card">
-                <div class="card-accent" style="background-color: #6ab04c;"></div>
-                <div class="card-content">
-                    <h3 class="card-title">咖啡与茶</h3>
-                    <p class="card-description"></p>
-                    <a href="咖啡与茶/index.html" class="read-button" style="background-color: #6ab04c;">阅读文章</a>
-                </div>
-            </div>
-        
             <div class="article-card">
                 <div class="card-accent" style="background-color: #eb4d4b;"></div>
                 <div class="card-content">
@@ -235,11 +249,11 @@
             </div>
         
             <div class="article-card">
-                <div class="card-accent" style="background-color: #22a6b3;"></div>
+                <div class="card-accent" style="background-color: #8854d0;"></div>
                 <div class="card-content">
-                    <h3 class="card-title">1950–2024年非虚构图书副标题长度趋势分析</h3>
-                    <p class="card-description">好的，我将提取 1950–2024 年间 Open Library 中的非虚构图书数据，分析副标题长度随时间的演变趋势，并标注诺贝尔奖作者的作品以比较学术出版与大众市场的差异。我会使用 OLS 回归建模年份对副标题长度的影响，并输出副标题长度的散点图及一篇约 900 字的趋势评论。完成后将以中...</p>
-                    <a href="非虚构书籍标题长度/index.html" class="read-button" style="background-color: #22a6b3;">阅读文章</a>
+                    <h3 class="card-title">堡垒之夜之战：Epic Games 与苹果 App Store 垄断诉讼全纪实</h3>
+                    <p class="card-description">2020年8月的某一天，游戏界突然爆发了一场"叛乱"。热门游戏《堡垒之夜 (Fortnite)》的开发商 Epic Games 悄悄在 iOS 版游戏中加入了一项新功能：玩家可以直接向 Epic 支付游戏币，不再通过苹果的 App Store 付款渠道。不仅如此，Epic 还大方宣布玩家直接付...</p>
+                    <a href="Epic 大战 Apple/index.html" class="read-button" style="background-color: #8854d0;">阅读文章</a>
                 </div>
             </div>
         
@@ -253,17 +267,44 @@
             </div>
         
             <div class="article-card">
-                <div class="card-accent" style="background-color: #8854d0;"></div>
+                <div class="card-accent" style="background-color: #eb4d4b;"></div>
                 <div class="card-content">
-                    <h3 class="card-title">堡垒之夜之战：Epic Games 与苹果 App Store 垄断诉讼全纪实</h3>
-                    <p class="card-description">2020年8月的某一天，游戏界突然爆发了一场"叛乱"。热门游戏《堡垒之夜 (Fortnite)》的开发商 Epic Games 悄悄在 iOS 版游戏中加入了一项新功能：玩家可以直接向 Epic 支付游戏币，不再通过苹果的 App Store 付款渠道。不仅如此，Epic 还大方宣布玩家直接付...</p>
-                    <a href="Epic 大战 Apple/index.html" class="read-button" style="background-color: #8854d0;">阅读文章</a>
+                    <h3 class="card-title">假设参数</h3>
+                    <p class="card-description">GPU供应链风险评估报告</p>
+                    <a href="气候影响 GPU 供应链/index.html" class="read-button" style="background-color: #eb4d4b;">阅读文章</a>
+                </div>
+            </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #22a6b3;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">b 站情绪</h3>
+                    <p class="card-description">B站AI绘图区舆论极化与情绪趋势分析</p>
+                    <a href="B 站情绪分析/index.html" class="read-button" style="background-color: #22a6b3;">阅读文章</a>
+                </div>
+            </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #22a6b3;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">1950–2024年非虚构图书副标题长度趋势分析</h3>
+                    <p class="card-description">好的，我将提取 1950–2024 年间 Open Library 中的非虚构图书数据，分析副标题长度随时间的演变趋势，并标注诺贝尔奖作者的作品以比较学术出版与大众市场的差异。我会使用 OLS 回归建模年份对副标题长度的影响，并输出副标题长度的散点图及一篇约 900 字的趋势评论。完成后将以中...</p>
+                    <a href="非虚构书籍标题长度/index.html" class="read-button" style="background-color: #22a6b3;">阅读文章</a>
+                </div>
+            </div>
+        
+            <div class="article-card">
+                <div class="card-accent" style="background-color: #6ab04c;"></div>
+                <div class="card-content">
+                    <h3 class="card-title">扫描所有模型的描述和评论</h3>
+                    <p class="card-description">2023-2025 年 Civitai 热门 LoRA/LyCORIS 模型多步骤分析</p>
+                    <a href="Citiva 研究/index.html" class="read-button" style="background-color: #6ab04c;">阅读文章</a>
                 </div>
             </div>
         
         </div>
 
-        <p class="last-updated">最后更新: 2025年05月03日 10:19</p>
+        <p class="last-updated">最后更新: 2025年05月03日 23:06</p>
     </div>
 
     <footer>

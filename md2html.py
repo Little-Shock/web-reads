@@ -56,10 +56,7 @@ def generate_toc_html(toc_items):
     toc_html += '</div>\n'
     return toc_html
 
-def process_special_markers(html_content):
-    """处理特殊标记"""
-    # 日期标记已经在行处理时完成
-    return html_content
+# 日期标记已经在行处理时完成，不需要额外的处理函数
 
 def convert_markdown_to_html(md_content):
     """将Markdown转换为HTML"""
@@ -126,6 +123,22 @@ def convert_markdown_to_html(md_content):
             html_lines.append('</blockquote>')
             in_blockquote = False
 
+        # 检查是否为列表项
+        if line.startswith('•'):
+            if in_paragraph:
+                html_lines.append('</p>')
+                in_paragraph = False
+
+            # 提取列表项内容
+            list_content = line[1:].strip()
+
+            # 处理列表项中的强调
+            list_content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', list_content)
+
+            # 添加列表项
+            html_lines.append(f'<div class="list-item" style="margin-bottom: 1rem; padding-left: 1.5rem; text-indent: -1rem;">• {html_module.escape(list_content)}</div>')
+            continue
+
         # 处理普通段落
         if not in_paragraph:
             html_lines.append('<p>')
@@ -177,9 +190,6 @@ def convert_markdown_to_html(md_content):
         html_lines.append('</blockquote>')
 
     html = '\n'.join(html_lines)
-
-    # 处理特殊标记
-    html = process_special_markers(html)
 
     # 处理参考文献
     ref_pattern = r'<p>\s*<strong>（本文作者根据公开资料整理，(.+?)）</strong>\s*</p>'
@@ -242,6 +252,12 @@ def main():
             --border-color: #eee;
             --link-color: #0366d6;
             --header-bg: #f8f9fa;
+            --container-width: 800px;
+            --container-padding: 20px;
+            --font-size: 16px;
+            --line-height: 1.7;
+            --font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --serif-font: 'Noto Serif SC', serif;
         }}
 
         [data-theme="dark"] {{
@@ -254,18 +270,28 @@ def main():
             --header-bg: #1e1e1e;
         }}
 
+        [data-theme="sepia"] {{
+            --text-color: #5F4B32;
+            --bg-color: #F9F5E9;
+            --highlight-color: #d23669;
+            --secondary-color: #7D6E5B;
+            --border-color: #E8E0D0;
+            --link-color: #9C6644;
+            --header-bg: #F2ECD9;
+        }}
+
         * {{
             box-sizing: border-box;
         }}
 
         html {{
             scroll-behavior: smooth;
-            font-size: 16px;
+            font-size: var(--font-size);
         }}
 
         body {{
-            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.7;
+            font-family: var(--font-family);
+            line-height: var(--line-height);
             color: var(--text-color);
             background-color: var(--bg-color);
             max-width: 100%;
@@ -275,8 +301,8 @@ def main():
         }}
 
         .container {{
-            padding: 20px;
-            max-width: 800px;
+            padding: var(--container-padding);
+            max-width: var(--container-width);
             margin: 0 auto;
         }}
 
@@ -293,9 +319,9 @@ def main():
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 800px;
+            max-width: var(--container-width);
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 var(--container-padding);
         }}
 
         .title-small {{
@@ -314,7 +340,7 @@ def main():
         }}
 
         h1 {{
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--serif-font);
             font-size: 1.8rem;
             margin-top: 1.5rem;
             margin-bottom: 1.5rem;
@@ -322,7 +348,7 @@ def main():
         }}
 
         h2 {{
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--serif-font);
             font-size: 1.4rem;
             margin-top: 2.5rem;
             margin-bottom: 1.2rem;
@@ -350,7 +376,7 @@ def main():
             font-weight: 700;
             margin-right: 0.1em;
             margin-top: 0.1em;
-            font-family: 'Noto Serif SC', serif;
+            font-family: var(--serif-font);
             color: var(--highlight-color);
         }}
 
@@ -425,6 +451,14 @@ def main():
             margin-top: -0.5rem;
         }}
 
+        /* 列表项样式 */
+        .list-item {{
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            text-indent: -1rem;
+            line-height: 1.6;
+        }}
+
         /* 阅读进度指示器 */
         .progress-container {{
             width: 100%;
@@ -467,13 +501,17 @@ def main():
             opacity: 1;
         }}
 
+        /* 阅读设置样式由reader-settings.js动态添加 */
+
+        /* 响应式调整 */
         @media (max-width: 600px) {{
             html {{
-                font-size: 15px;
+                font-size: 18px;
             }}
 
             .container {{
-                padding: 15px;
+                padding: 20px;
+                max-width: 100%;
             }}
 
             h1 {{
@@ -486,6 +524,19 @@ def main():
 
             .dropcap {{
                 font-size: 3em;
+            }}
+
+            /* 改善移动端可读性 */
+            p {{
+                text-align: left;
+            }}
+
+            /* 改善列表项在移动端的显示 */
+            .list-item {{
+                padding-left: 1rem !important;
+                text-indent: -0.7rem !important;
+                font-size: 1rem;
+                line-height: 1.5;
             }}
         }}
     </style>
@@ -506,7 +557,10 @@ def main():
                 </a>
                 <h3 class="title-small">{short_title}</h3>
             </div>
-            <button class="theme-toggle" id="theme-toggle">🌙</button>
+            <div style="display: flex; align-items: center;">
+                <!-- 设置按钮由reader-settings.js动态创建 -->
+                <button class="theme-toggle" id="theme-toggle">🌙</button>
+            </div>
         </div>
     </header>
 
@@ -518,9 +572,12 @@ def main():
         {html_content}
     </div>
 
+    <!-- 阅读设置面板由reader-settings.js动态创建 -->
+
     <script>
-        // 暗黑模式切换功能
+        // 基本功能脚本
         const themeToggle = document.getElementById('theme-toggle');
+        const backToTopButton = document.getElementById('back-to-top');
 
         // 检查本地存储中的主题设置
         if (localStorage.getItem('theme') === 'dark') {{
@@ -528,10 +585,11 @@ def main():
             themeToggle.textContent = '☀️';
         }}
 
-        // 切换主题
+        // 切换主题（基本功能，详细设置由reader-settings.js处理）
         themeToggle.addEventListener('click', () => {{
-            if (document.documentElement.getAttribute('data-theme') === 'dark') {{
-                document.documentElement.removeAttribute('data-theme');
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {{
+                document.documentElement.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
                 themeToggle.textContent = '🌙';
             }} else {{
@@ -542,8 +600,6 @@ def main():
         }});
 
         // 阅读进度指示器和回到顶部按钮
-        const backToTopButton = document.getElementById("back-to-top");
-
         window.onscroll = function() {{
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -566,6 +622,9 @@ def main():
             }});
         }});
     </script>
+
+    <!-- 引入阅读设置脚本 -->
+    <script src="../reader-settings.js"></script>
 </body>
 </html>'''
 
