@@ -256,6 +256,7 @@ def main():
             --container-padding: 20px;
             --font-size: 16px;
             --line-height: 1.7;
+            --paragraph-spacing: 1.4rem;
             --font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --serif-font: 'Noto Serif SC', serif;
         }}
@@ -301,6 +302,7 @@ def main():
         }}
 
         .container {{
+            /* 使用左右页边距，而不是上下 */
             padding: var(--container-padding);
             max-width: var(--container-width);
             margin: 0 auto;
@@ -321,7 +323,7 @@ def main():
             align-items: center;
             max-width: var(--container-width);
             margin: 0 auto;
-            padding: 0 var(--container-padding);
+            padding: var(--container-padding);
         }}
 
         .title-small {{
@@ -358,7 +360,7 @@ def main():
         }}
 
         p {{
-            margin-bottom: 1.4rem;
+            margin-bottom: var(--paragraph-spacing);
             font-size: 1.05rem;
             text-align: justify;
         }}
@@ -503,13 +505,28 @@ def main():
 
         /* 阅读设置样式由reader-settings.js动态添加 */
 
+        /* 特殊的CSS类，用于在移动端应用我们的设置 */
+        .reader-settings-applied {{
+            font-size: var(--font-size) !important;
+        }}
+
+        .reader-settings-applied p {{
+            margin-bottom: var(--paragraph-spacing) !important;
+        }}
+
+        .reader-settings-applied .container {{
+            padding: var(--container-padding) !important;
+            max-width: var(--container-width) !important;
+        }}
+
         /* 响应式调整 */
         @media (max-width: 600px) {{
-            html {{
+            /* 默认移动端样式，但可以被reader-settings-applied类覆盖 */
+            html:not(.reader-settings-applied) {{
                 font-size: 18px;
             }}
 
-            .container {{
+            .container:not(.reader-settings-applied) {{
                 padding: 20px;
                 max-width: 100%;
             }}
@@ -527,8 +544,9 @@ def main():
             }}
 
             /* 改善移动端可读性 */
-            p {{
+            p:not(.reader-settings-applied p) {{
                 text-align: left;
+                margin-bottom: 1.4rem;
             }}
 
             /* 改善列表项在移动端的显示 */

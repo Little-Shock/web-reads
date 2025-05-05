@@ -62,6 +62,18 @@ function createSettingsPanel() {
         </div>
 
         <div class="settings-section">
+            <div class="settings-title">段落间距</div>
+            <div class="settings-option">
+                <div class="settings-label">紧凑</div>
+                <div class="slider-container">
+                    <input type="range" min="0.8" max="2.5" value="1.4" step="0.1" class="slider" id="paragraph-spacing-slider">
+                </div>
+                <div class="settings-label">宽松</div>
+            </div>
+            <div style="text-align: center; margin-top: 5px;" id="paragraph-spacing-value">1.4rem</div>
+        </div>
+
+        <div class="settings-section">
             <div class="settings-title">页边距</div>
             <div class="settings-option">
                 <div class="settings-label">窄</div>
@@ -325,6 +337,8 @@ function initSettings() {
     const fontSizeValue = document.getElementById('font-size-value');
     const lineHeightSlider = document.getElementById('line-height-slider');
     const lineHeightValue = document.getElementById('line-height-value');
+    const paragraphSpacingSlider = document.getElementById('paragraph-spacing-slider');
+    const paragraphSpacingValue = document.getElementById('paragraph-spacing-value');
     const marginSlider = document.getElementById('margin-slider');
     const marginValue = document.getElementById('margin-value');
     const themeOptions = document.querySelectorAll('.theme-option');
@@ -367,8 +381,9 @@ function initSettings() {
         // 检测是否为移动设备
         const isMobile = window.innerWidth <= 600;
 
-        // 字体大小设置 - 移动端默认更大
+        // 字体大小设置 - 移动端默认更大，但仍然尊重用户的设置
         const defaultFontSize = isMobile ? '18' : '16';
+        // 如果用户已经设置了字体大小，则使用用户的设置，否则使用默认值
         const fontSize = localStorage.getItem('fontSize') || defaultFontSize;
         document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
         if (fontSizeSlider) fontSizeSlider.value = fontSize;
@@ -380,18 +395,37 @@ function initSettings() {
         if (lineHeightSlider) lineHeightSlider.value = lineHeight;
         if (lineHeightValue) lineHeightValue.textContent = lineHeight;
 
-        // 页边距设置 - 移动端默认更宽
+        // 段落间距设置
+        const paragraphSpacing = localStorage.getItem('paragraphSpacing') || '1.4';
+        document.documentElement.style.setProperty('--paragraph-spacing', `${paragraphSpacing}rem`);
+        if (paragraphSpacingSlider) paragraphSpacingSlider.value = paragraphSpacing;
+        if (paragraphSpacingValue) paragraphSpacingValue.textContent = `${paragraphSpacing}rem`;
+
+        // 页边距设置 - 移动端默认更宽，但仍然尊重用户的设置
         const defaultMargin = isMobile ? '8' : '5';
+        // 如果用户已经设置了页边距，则使用用户的设置，否则使用默认值
         const margin = localStorage.getItem('margin') || defaultMargin;
         const containerWidth = 100 - (margin * 2);
-        document.documentElement.style.setProperty('--container-padding', `${margin}%`);
+        // 确保页边距应用于左右两侧，而不是上下
+        document.documentElement.style.setProperty('--container-padding', `0 ${margin}%`);
         document.documentElement.style.setProperty('--container-width', `${containerWidth}%`);
+
+        // 添加特殊的移动端样式覆盖
+        if (window.innerWidth <= 600) {
+            // 在移动端强制应用我们的设置
+            document.documentElement.classList.add('reader-settings-applied');
+        }
         if (marginSlider) marginSlider.value = margin;
         if (marginValue) marginValue.textContent = `${margin}%`;
     }
 
     // 初始加载设置
     loadSettings();
+
+    // 在页面加载时检查是否为移动端，如果是则应用我们的设置
+    if (window.innerWidth <= 600) {
+        document.documentElement.classList.add('reader-settings-applied');
+    }
 
     // 打开设置面板
     if (settingsButton) {
@@ -449,6 +483,11 @@ function initSettings() {
         fontSizeSlider.addEventListener('input', () => {
             const fontSize = fontSizeSlider.value;
             document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
+            // 添加特殊的移动端样式覆盖
+            if (window.innerWidth <= 600) {
+                // 在移动端强制应用我们的设置
+                document.documentElement.classList.add('reader-settings-applied');
+            }
             fontSizeValue.textContent = `${fontSize}px`;
             localStorage.setItem('fontSize', fontSize);
         });
@@ -459,8 +498,28 @@ function initSettings() {
         lineHeightSlider.addEventListener('input', () => {
             const lineHeight = lineHeightSlider.value;
             document.documentElement.style.setProperty('--line-height', lineHeight);
+            // 添加特殊的移动端样式覆盖
+            if (window.innerWidth <= 600) {
+                // 在移动端强制应用我们的设置
+                document.documentElement.classList.add('reader-settings-applied');
+            }
             lineHeightValue.textContent = lineHeight;
             localStorage.setItem('lineHeight', lineHeight);
+        });
+    }
+
+    // 段落间距滑块事件
+    if (paragraphSpacingSlider) {
+        paragraphSpacingSlider.addEventListener('input', () => {
+            const paragraphSpacing = paragraphSpacingSlider.value;
+            document.documentElement.style.setProperty('--paragraph-spacing', `${paragraphSpacing}rem`);
+            // 添加特殊的移动端样式覆盖
+            if (window.innerWidth <= 600) {
+                // 在移动端强制应用我们的设置
+                document.documentElement.classList.add('reader-settings-applied');
+            }
+            paragraphSpacingValue.textContent = `${paragraphSpacing}rem`;
+            localStorage.setItem('paragraphSpacing', paragraphSpacing);
         });
     }
 
@@ -469,8 +528,14 @@ function initSettings() {
         marginSlider.addEventListener('input', () => {
             const margin = marginSlider.value;
             const containerWidth = 100 - (margin * 2);
-            document.documentElement.style.setProperty('--container-padding', `${margin}%`);
+            // 确保页边距应用于左右两侧，而不是上下
+            document.documentElement.style.setProperty('--container-padding', `0 ${margin}%`);
             document.documentElement.style.setProperty('--container-width', `${containerWidth}%`);
+            // 添加特殊的移动端样式覆盖
+            if (window.innerWidth <= 600) {
+                // 在移动端强制应用我们的设置
+                document.documentElement.classList.add('reader-settings-applied');
+            }
             marginValue.textContent = `${margin}%`;
             localStorage.setItem('margin', margin);
         });
@@ -483,6 +548,17 @@ function initSettings() {
             event.target !== settingsButton &&
             settingsPanel.classList.contains('open')) {
             settingsPanel.classList.remove('open');
+        }
+    });
+
+    // 监听窗口大小变化，确保在移动端正确应用我们的设置
+    window.addEventListener('resize', () => {
+        if (window.innerWidth <= 600) {
+            // 在移动端强制应用我们的设置
+            document.documentElement.classList.add('reader-settings-applied');
+        } else {
+            // 在桌面端移除特殊的样式覆盖
+            document.documentElement.classList.remove('reader-settings-applied');
         }
     });
 }
