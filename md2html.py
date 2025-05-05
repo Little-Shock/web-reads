@@ -13,13 +13,26 @@ import re
 import sys
 import argparse
 import html as html_module
+from pathlib import Path # 引入 Path
+
+# --- 配置 ---
+# 扫描时的基础目录
+ARTICLES_DIR = "."
+# 扫描时排除的目录名
+EXCLUDED_DIRS = [".git", "__pycache__", "node_modules", "开发过程"]
+# Markdown 文件后缀
+MD_SUFFIX = ".md"
+# 输出的 HTML 文件名
+OUTPUT_HTML = "index.html"
+# --- End 配置 ---
 
 def parse_args():
     """解析命令行参数"""
-    parser = argparse.ArgumentParser(description='将Markdown文件转换为HTML页面')
-    parser.add_argument('markdown_file', help='Markdown文件路径')
+    parser = argparse.ArgumentParser(description='将Markdown文件转换为HTML页面。省略文件路径则扫描所有目录。')
+    # 修改为可选参数
+    parser.add_argument('markdown_file', nargs='?', default=None, help=f'Markdown文件路径 (可选，省略则扫描 {ARTICLES_DIR} 下的所有文章目录)')
     parser.add_argument('--title', help='自定义页面标题')
-    parser.add_argument('--output', help='输出文件路径')
+    parser.add_argument('--output', help='输出文件路径 (仅在指定单个 markdown_file 时有效)')
     return parser.parse_args()
 
 def extract_title(md_content):
@@ -57,6 +70,22 @@ def generate_toc_html(toc_items):
     return toc_html
 
 # 日期标记已经在行处理时完成，不需要额外的处理函数
+
+def scan_for_md_files(base_dir, excluded_dirs, md_suffix):
+    """扫描指定目录下（排除特定子目录）的所有 Markdown 文件"""
+    md_files = []
+    for root, dirs, files in os.walk(base_dir, topdown=True):
+        # 修改 dirs 列表以排除特定目录
+        dirs[:] = [d for d in dirs if d not in excluded_dirs and not d.startswith('.')]
+
+        # 只处理子目录中的文件，不处理 base_dir 根目录下的文件
+        if root == base_dir:
+            continue
+
+        for file in files:
+            if file.lower().endswith(md_suffix):
+                md_files.append(os.path.join(root, file))
+    return md_files
 
 def convert_markdown_to_html(md_content):
     """将Markdown转换为HTML"""
@@ -198,43 +227,46 @@ def convert_markdown_to_html(md_content):
 
     return html
 
-def main():
-    """主函数"""
-    args = parse_args()
+def convert_single_file(md_file_path, custom_title=None, output_path_arg=None):
+    """转换单个Markdown文件为HTML"""
+    try:
+        # 检查文件是否存在
+        if not os.path.exists(md_file_path):
+            print(f"错误: 文件 '{md_file_path}' 不存在")
+            return False # 返回失败
 
-    # 检查文件是否存在
-    if not os.path.exists(args.markdown_file):
-        print(f"错误: 文件 '{args.markdown_file}' 不存在")
-        sys.exit(1)
+        # 读取Markdown文件
+        with open(md_file_path, 'r', encoding='utf-8') as f:
+            md_content = f.read()
 
-    # 读取Markdown文件
-    with open(args.markdown_file, 'r', encoding='utf-8') as f:
-        md_content = f.read()
+        # 提取标题
+        title = custom_title or extract_title(md_content) or Path(md_file_path).stem # 使用 stem 获取无后缀的文件名
 
-    # 提取标题
-    title = args.title or extract_title(md_content) or os.path.basename(args.markdown_file).replace('.md', '')
+        # 转换Markdown为HTML
+        html_content = convert_markdown_to_html(md_content)
 
-    # 转换Markdown为HTML
-    html_content = convert_markdown_to_html(md_content)
+        # 提取目录项
+        toc_items = extract_toc_items(html_content)
 
-    # 提取目录项
-    toc_items = extract_toc_items(html_content)
+        # 生成目录HTML
+        toc_html = generate_toc_html(toc_items)
 
-    # 生成目录HTML
-    toc_html = generate_toc_html(toc_items)
+        # 确定输出路径
+        if output_path_arg:
+            # 如果命令行指定了输出路径 (仅在单文件模式下有效)
+            output_path = output_path_arg
+            os.makedirs(os.path.dirname(output_path), exist_ok=True) # 确保目录存在
+        else:
+            # 默认输出到 Markdown 文件所在的目录，文件名为 index.html
+            dir_name = os.path.dirname(md_file_path)
+            output_path = os.path.join(dir_name, OUTPUT_HTML)
 
-    # 确定输出路径
-    if args.output:
-        output_path = args.output
-    else:
-        dir_name = os.path.dirname(args.markdown_file)
-        output_path = os.path.join(dir_name, 'index.html')
+        # 获取简短标题（用于导航栏）
+        short_title = title.split('：')[0] if '：' in title else title
 
-    # 获取简短标题（用于导航栏）
-    short_title = title.split('：')[0] if '：' in title else title
-
-    # HTML模板
-    html_template = f'''<!DOCTYPE html>
+        # HTML模板 (保持不变, 但确保变量名如 {title}, {short_title}, {toc_html}, {html_content} 存在)
+        # 注意: f-string 需要双花括号来转义CSS中的花括号 {{ ... }}
+        html_template = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -302,8 +334,10 @@ def main():
         }}
 
         .container {{
-            /* 使用左右页边距，而不是上下 */
-            padding: var(--container-padding);
+            padding-left: var(--container-padding);
+            padding-right: var(--container-padding);
+            padding-top: 10px;
+            padding-bottom: 10px;
             max-width: var(--container-width);
             margin: 0 auto;
         }}
@@ -323,7 +357,10 @@ def main():
             align-items: center;
             max-width: var(--container-width);
             margin: 0 auto;
-            padding: var(--container-padding);
+            /* 在批量模式下，CSS 中的相对路径需要调整 */
+            /* padding: var(--container-padding); */ /* 这行似乎不适合header */
+             padding-left: var(--container-padding);
+             padding-right: var(--container-padding);
         }}
 
         .title-small {{
@@ -370,7 +407,6 @@ def main():
             font-weight: 700;
         }}
 
-        /* 首字下沉效果 */
         .dropcap {{
             float: left;
             font-size: 3.5em;
@@ -382,7 +418,6 @@ def main():
             color: var(--highlight-color);
         }}
 
-        /* 引用样式 */
         blockquote {{
             margin: 1.5em 0;
             padding: 1em 1.5em;
@@ -396,7 +431,6 @@ def main():
             background-color: rgba(255,255,255,0.05);
         }}
 
-        /* 重要日期标记 */
         .date-marker {{
             font-weight: 700;
             text-decoration: underline;
@@ -445,7 +479,6 @@ def main():
             text-decoration: underline;
         }}
 
-        /* 图片描述样式 */
         .image-description {{
             font-size: 0.95rem;
             color: var(--secondary-color);
@@ -453,7 +486,6 @@ def main():
             margin-top: -0.5rem;
         }}
 
-        /* 列表项样式 */
         .list-item {{
             margin-bottom: 1rem;
             padding-left: 2rem;
@@ -461,7 +493,6 @@ def main():
             line-height: 1.6;
         }}
 
-        /* 阅读进度指示器 */
         .progress-container {{
             width: 100%;
             height: 4px;
@@ -479,7 +510,6 @@ def main():
             transition: width 0.1s ease;
         }}
 
-        /* 回到顶部按钮 */
         .back-to-top {{
             position: fixed;
             bottom: 20px;
@@ -503,8 +533,6 @@ def main():
             opacity: 1;
         }}
 
-        /* 阅读设置样式由reader-settings.js动态添加 */
-
         /* 特殊的CSS类，用于在移动端应用我们的设置 */
         .reader-settings-applied {{
             font-size: var(--font-size) !important;
@@ -515,19 +543,26 @@ def main():
         }}
 
         .reader-settings-applied .container {{
-            padding: var(--container-padding) !important;
+            /* 在 reader-settings 中应用 padding，这里保持默认 */
+            /* padding: var(--container-padding) !important; */
+             padding-left: var(--container-padding) !important;
+             padding-right: var(--container-padding) !important;
+             padding-top: 10px !important;
+             padding-bottom: 10px !important;
             max-width: var(--container-width) !important;
         }}
 
-        /* 响应式调整 */
+        /* 响应式调整 - 注意 f-string 的花括号转义 {{ ... }} */
         @media (max-width: 600px) {{
-            /* 默认移动端样式，但可以被reader-settings-applied类覆盖 */
             html:not(.reader-settings-applied) {{
-                font-size: 18px;
+                font-size: var(--font-size);
             }}
 
             .container:not(.reader-settings-applied) {{
-                padding: 20px;
+                padding-left: var(--container-padding);
+                padding-right: var(--container-padding);
+                padding-top: 10px;
+                padding-bottom: 10px;
                 max-width: 100%;
             }}
 
@@ -543,10 +578,9 @@ def main():
                 font-size: 3em;
             }}
 
-            /* 改善移动端可读性 */
-            p:not(.reader-settings-applied p) {{
+            html:not(.reader-settings-applied) p {{
                 text-align: left;
-                margin-bottom: 1.4rem;
+                margin-bottom: var(--paragraph-spacing);
             }}
 
             /* 改善列表项在移动端的显示 */
@@ -569,7 +603,8 @@ def main():
     <header>
         <div class="header-content">
             <div style="display: flex; align-items: center;">
-                <a href="../index.html" style="display: flex; align-items: center; color: var(--text-color); text-decoration: none; margin-right: 15px;">
+                 <!-- 返回主页链接需要是相对根目录的 -->
+                <a href="../{OUTPUT_HTML}" style="display: flex; align-items: center; color: var(--text-color); text-decoration: none; margin-right: 15px;">
                     <span style="font-size: 1.2rem; margin-right: 5px;">←</span>
                     <span style="font-size: 0.9rem;">返回主页</span>
                 </a>
@@ -598,6 +633,7 @@ def main():
         const backToTopButton = document.getElementById('back-to-top');
 
         // 检查本地存储中的主题设置
+        // 注意 JS 中的花括号也需要转义 {{ ... }}
         if (localStorage.getItem('theme') === 'dark') {{
             document.documentElement.setAttribute('data-theme', 'dark');
             themeToggle.textContent = '☀️';
@@ -622,35 +658,94 @@ def main():
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
-            document.getElementById("progress-bar").style.width = scrolled + "%";
+            // 需要检查元素是否存在
+            const progressBar = document.getElementById("progress-bar");
+            if (progressBar) {{
+                 progressBar.style.width = scrolled + "%";
+            }}
+
 
             // 显示或隐藏回到顶部按钮
-            if (winScroll > 300) {{
-                backToTopButton.classList.add("visible");
-            }} else {{
-                backToTopButton.classList.remove("visible");
+            if (backToTopButton) {{ // 检查按钮是否存在
+                 if (winScroll > 300) {{
+                    backToTopButton.classList.add("visible");
+                }} else {{
+                    backToTopButton.classList.remove("visible");
+                }}
             }}
         }};
 
         // 回到顶部功能
-        backToTopButton.addEventListener("click", function() {{
-            window.scrollTo({{
-                top: 0,
-                behavior: "smooth"
+        if (backToTopButton) {{ // 检查按钮是否存在
+             backToTopButton.addEventListener("click", function() {{
+                window.scrollTo({{
+                    top: 0,
+                    behavior: "smooth"
+                }});
             }});
-        }});
+        }}
     </script>
 
-    <!-- 引入阅读设置脚本 -->
+    <!-- 引入阅读设置脚本 - 路径相对于根目录 -->
     <script src="../reader-settings.js"></script>
 </body>
-</html>'''
+</html>''' # 结束 f-string
 
-    # 写入HTML文件
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(html_template)
+        # 写入HTML文件
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html_template)
 
-    print(f"成功将 '{args.markdown_file}' 转换为 '{output_path}'")
+        print(f"成功将 '{md_file_path}' 转换为 '{output_path}'")
+        return True # 返回成功
+
+    except Exception as e:
+        print(f"处理文件 '{md_file_path}' 时出错: {e}")
+        import traceback
+        traceback.print_exc() # 打印详细错误信息
+        return False # 返回失败
+
+def main():
+    """主函数"""
+    args = parse_args()
+
+    if args.markdown_file:
+        # --- 单文件转换模式 ---
+        print(f"开始转换单个文件: {args.markdown_file}")
+        convert_single_file(args.markdown_file, args.title, args.output)
+    else:
+        # --- 批量扫描转换模式 ---
+        print(f"开始扫描目录 '{ARTICLES_DIR}' (排除: {EXCLUDED_DIRS}) 下的 {MD_SUFFIX} 文件...")
+        md_files_to_convert = scan_for_md_files(ARTICLES_DIR, EXCLUDED_DIRS, MD_SUFFIX)
+
+        if not md_files_to_convert:
+            print("未找到任何 Markdown 文件进行转换。")
+            sys.exit(0)
+
+        print(f"找到以下 {len(md_files_to_convert)} 个 Markdown 文件将被转换:")
+        for md_file in md_files_to_convert:
+            print(f"- {md_file}")
+
+        # 请求确认
+        try:
+             confirm = input("是否继续转换所有文件? (y/n): ").lower().strip()
+        except EOFError: # 处理管道输入或无交互环境
+             print("非交互模式，跳过确认。")
+             confirm = 'y' # 或者可以设置为 'n' 以默认取消
+
+        if confirm == 'y' or confirm == 'yes':
+            print("开始批量转换...")
+            success_count = 0
+            fail_count = 0
+            for md_file in md_files_to_convert:
+                if convert_single_file(md_file): # 使用默认标题和输出路径
+                    success_count += 1
+                else:
+                    fail_count += 1
+            print("-" * 20)
+            print(f"批量转换完成。成功: {success_count}, 失败: {fail_count}")
+        else:
+            print("操作已取消。")
+            sys.exit(0)
 
 if __name__ == '__main__':
     main()
